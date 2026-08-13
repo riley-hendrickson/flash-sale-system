@@ -1,37 +1,46 @@
-package flashsalesystem.inventoryservice.models;
+package flashsalesystem.inventoryservice.services;
 
+import flashsalesystem.inventoryservice.enums.ReservationResults;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
-public class Inventory
+public class InventoryService
 {
     private final ConcurrentHashMap<String, Integer> stock = new ConcurrentHashMap<>();
 
-    public boolean reserve(String productId, int quantityRequested)
+    public ReservationResults reserve(String productId, int quantityRequested)
     {
-        AtomicBoolean success = new AtomicBoolean(false);
+        AtomicReference<ReservationResults> result = new AtomicReference<>();
 
         stock.compute(productId, (id, currentQuantity) ->
         {
-            if(currentQuantity == null || currentQuantity < quantityRequested)
+            // if the product does not exist, return current quantity and set result accordingly
+            if(currentQuantity == null)
             {
-                success.set(false);
+                result.set(ReservationResults.PRODUCT_NOT_FOUND);
                 return currentQuantity;
             }
+            // if the product is not sufficiently stocked, return current quantity and set result accordingly
+            else if(currentQuantity < quantityRequested)
+            {
+                result.set(ReservationResults.INSUFFICIENT_STOCK);
+                return currentQuantity;
+            }
+            // if the product has adequate stock, set result accordingly and return the remaining quantity
             else
             {
-                success.set(true);
+                result.set(ReservationResults.SUCCESS);
                 return currentQuantity - quantityRequested;
             }
         });
 
-        return success.get();
+        return result.get();
     }
 
-    public Inventory()
+    public InventoryService()
     {
         stock.put("1", 1);
         stock.put("2", 10);

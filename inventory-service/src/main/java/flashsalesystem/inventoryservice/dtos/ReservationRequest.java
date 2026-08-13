@@ -1,4 +1,6 @@
 package flashsalesystem.inventoryservice.dtos;
 
-public record ReservationRequest() {
+public record ReservationRequest(int quantityRequested)
+{
+
 }

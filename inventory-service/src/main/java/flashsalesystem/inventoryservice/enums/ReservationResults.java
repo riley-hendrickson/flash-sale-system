@@ -1,4 +1,4 @@
-package flashsalesystem.inventoryservice;
+package flashsalesystem.inventoryservice.enums;
 
 public enum ReservationResults
 {
