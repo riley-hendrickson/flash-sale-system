@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestClient;
 
 @SpringBootApplication
 public class OrderServiceApplication
@@ -22,5 +23,11 @@ public class OrderServiceApplication
     public CommandLineRunner logDiscountRateOnStartup(@Value("${app.discount-rate}") double discountRate)
     {
         return args -> log.info("Discount rate from config server is {}", discountRate);
+    }
+
+    @Bean
+    public RestClient inventoryServiceClient(@Value("${services.inventory-service.url}") String inventoryServiceUrl)
+    {
+        return RestClient.builder().baseUrl(inventoryServiceUrl).build();
     }
 }
