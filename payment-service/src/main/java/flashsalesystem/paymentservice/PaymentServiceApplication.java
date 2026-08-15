@@ -21,9 +21,11 @@ public class PaymentServiceApplication
     }
 
     @Bean
-    public CommandLineRunner logFailureRateOnStartup(@Value("${app.failure-rate}") double failureRate)
+    public CommandLineRunner logFailureRateOnStartup(
+            @Value("${app.processor-failure-rate}") double processorFailureRate,
+            @Value("${app.payment-failure-rate}") double paymentFailureRate)
     {
-        return args -> log.info("Failure rate from config server is {}", failureRate);
+        return args -> log.info("Processor failure rate from config server is {} \n Payment failure rate from config server is {}", processorFailureRate, paymentFailureRate);
     }
 
 }
