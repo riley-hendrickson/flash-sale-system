@@ -27,6 +27,7 @@ public class PaymentController
         PaymentResult paymentResult = paymentService.processPayment(paymentRequest.orderId(), paymentRequest.amountDue());
         if(paymentResult == PaymentResult.SUCCESS) return ResponseEntity.ok().build();
         else if(paymentResult == PaymentResult.PAYMENT_FAILED) return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        else return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+        else if(paymentResult == PaymentResult.PROCESSOR_ERROR) return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+        else return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }
