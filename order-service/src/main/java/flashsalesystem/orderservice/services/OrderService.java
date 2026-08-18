@@ -7,6 +7,10 @@ import flashsalesystem.orderservice.enums.OrderResults;
 import flashsalesystem.orderservice.enums.PaymentResults;
 import flashsalesystem.orderservice.enums.ReservationResults;
 import flashsalesystem.orderservice.enums.ReturnResults;
+import flashsalesystem.orderservice.exceptions.PaymentProcessorException;
+import flashsalesystem.orderservice.exceptions.UnexpectedPaymentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -16,6 +20,8 @@ public class OrderService
 {
     private final RestClient inventoryServiceClient;
     private final RestClient paymentServiceClient;
+
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     public OrderService(RestClient inventoryServiceClient, RestClient paymentServiceClient)
     {
@@ -30,15 +36,32 @@ public class OrderService
         // if stock reservation is successful, process payment
         if(reservationResults == ReservationResults.SUCCESS)
         {
-            PaymentResults paymentResults = processPayment(orderId, amountDue);
+            PaymentResults paymentResults;
+            try
+            {
+                paymentResults = processPayment(orderId, amountDue);
+            }
+            catch(PaymentProcessorException e)
+            {
+                // attempt to return stock to inventory service
+                releaseReservation(productId, quantityRequested);
+                // return appropriate OrderResult depending on payment error
+                return OrderResults.PAYMENT_PROCESSING_ERROR;
+            }
+            catch(UnexpectedPaymentException e)
+            {
+                // attempt to return stock to inventory service
+                releaseReservation(productId, quantityRequested);
+                // return appropriate OrderResult depending on payment error
+                return OrderResults.UNKNOWN_PAYMENT_ERROR;
+            }
             if(paymentResults == PaymentResults.SUCCESS) return OrderResults.SUCCESS;
             // if payment is unsuccessful, return stock to inventory service
             else
             {
-                if(returnStock(productId, quantityRequested) != ReturnResults.SUCCESS) System.out.println("Failed to return stock");
+                releaseReservation(productId, quantityRequested);
                 // return appropriate OrderResult depending on payment error
                 if(paymentResults == PaymentResults.PAYMENT_FAILED) return OrderResults.PAYMENT_FAILED;
-                else if(paymentResults == PaymentResults.PROCESSOR_ERROR) return OrderResults.PAYMENT_PROCESSING_ERROR;
                 else return OrderResults.UNKNOWN_PAYMENT_ERROR;
             }
         }
@@ -75,6 +98,14 @@ public class OrderService
                 });
     }
 
+    private void releaseReservation(String productId, int quantityToReturn)
+    {
+        if(returnStock(productId, quantityToReturn) != ReturnResults.SUCCESS)
+        {
+            log.warn("Failed to return stock reservation for product {}.", productId);
+        }
+    }
+
     private PaymentResults processPayment(String orderId, double amountDue)
     {
         return paymentServiceClient.post()
@@ -84,8 +115,14 @@ public class OrderService
                 {
                     if(response.getStatusCode().isSameCodeAs(HttpStatus.OK)) return PaymentResults.SUCCESS;
                     else if(response.getStatusCode().isSameCodeAs(HttpStatus.CONFLICT)) return PaymentResults.PAYMENT_FAILED;
-                    else if(response.getStatusCode().isSameCodeAs(HttpStatus.BAD_GATEWAY)) return PaymentResults.PROCESSOR_ERROR;
-                    else return PaymentResults.UNKNOWN_ERROR;
+                    else if(response.getStatusCode().isSameCodeAs(HttpStatus.BAD_GATEWAY))
+                    {
+                        throw new PaymentProcessorException("Payment processor error");
+                    }
+                    else
+                    {
+                        throw new UnexpectedPaymentException("Unexpected payment error");
+                    }
                 });
     }
 }
