@@ -1,4 +1,6 @@
 package flashsalesystem.orderservice.enums;
 
-public enum OrderResults {
+public enum OrderResults
+{
+    SUCCESS, INSUFFICIENT_STOCK, PRODUCT_NOT_FOUND, PAYMENT_FAILED, PAYMENT_PROCESSING_ERROR, UNKNOWN_PAYMENT_ERROR, UNKNOWN_RESERVATION_ERROR, UNKNOWN_ERROR
 }

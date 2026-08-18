@@ -2,5 +2,5 @@ package flashsalesystem.orderservice.enums;
 
 public enum PaymentResults
 {
-    SUCCESS, FAILURE, UNKNOWN_ERROR
+    SUCCESS, PAYMENT_FAILED, PROCESSOR_ERROR, UNKNOWN_ERROR
 }
