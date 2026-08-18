@@ -1,6 +1,7 @@
 package flashsalesystem.inventoryservice.services;
 
 import flashsalesystem.inventoryservice.enums.ReservationResults;
+import flashsalesystem.inventoryservice.enums.ReturnResults;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +35,28 @@ public class InventoryService
             {
                 result.set(ReservationResults.SUCCESS);
                 return currentQuantity - quantityRequested;
+            }
+        });
+
+        return result.get();
+    }
+
+    public ReturnResults returnStock(String productId, int quantityReturned)
+    {
+        AtomicReference<ReturnResults> result = new AtomicReference<>();
+
+        stock.compute(productId, (id, currentQuantity) ->
+        {
+            // if the product does not exist, return current quantity and set result accordingly
+            if(currentQuantity == null)
+            {
+                result.set(ReturnResults.PRODUCT_NOT_FOUND);
+                return currentQuantity;
+            }
+            else
+            {
+                result.set(ReturnResults.SUCCESS);
+                return currentQuantity + quantityReturned;
             }
         });
 
