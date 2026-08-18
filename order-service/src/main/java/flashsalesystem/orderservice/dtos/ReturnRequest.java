@@ -1,4 +1,5 @@
 package flashsalesystem.orderservice.dtos;
 
-public record ReturnRequest() {
+public record ReturnRequest(int quantityReturned)
+{
 }
