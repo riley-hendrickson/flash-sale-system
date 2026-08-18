@@ -30,4 +30,10 @@ public class OrderServiceApplication
     {
         return RestClient.builder().baseUrl(inventoryServiceUrl).build();
     }
+
+    @Bean
+    public RestClient paymentServiceClient(@Value("${services.payment-service.url}") String paymentServiceUrl)
+    {
+        return RestClient.builder().baseUrl(paymentServiceUrl).build();
+    }
 }
