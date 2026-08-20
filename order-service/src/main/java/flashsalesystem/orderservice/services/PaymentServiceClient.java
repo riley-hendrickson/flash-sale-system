@@ -22,7 +22,7 @@ public class PaymentServiceClient
     }
 
     @Retry(name = "paymentService", fallbackMethod = "processPaymentFallback")
-    @CircuitBreaker(name = "paymentService", fallbackMethod = "processPaymentFallback")
+    @CircuitBreaker(name = "paymentService")
     public PaymentResults processPayment(String orderId, double amountDue)
     {
         System.out.println("processing payment for order: " + orderId + " with amount: " + amountDue);

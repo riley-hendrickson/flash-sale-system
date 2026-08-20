@@ -56,6 +56,10 @@ public class OrderController
         {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new OrderResponse(result, "Payment service unavailable"));
         }
+        else if(result == OrderResults.INVENTORY_SERVICE_UNAVAILABLE)
+        {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new OrderResponse(result, "Inventory service unavailable"));
+        }
         else
         {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new OrderResponse(result, "Unknown error"));

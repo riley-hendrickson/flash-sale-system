@@ -5,6 +5,7 @@ import flashsalesystem.orderservice.enums.PaymentResults;
 import flashsalesystem.orderservice.enums.ReservationResults;
 import flashsalesystem.orderservice.enums.ReturnResults;
 import flashsalesystem.orderservice.exceptions.PaymentProcessorException;
+import flashsalesystem.orderservice.exceptions.UnexpectedInventoryException;
 import flashsalesystem.orderservice.exceptions.UnexpectedPaymentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,15 @@ public class OrderService
     public OrderResults placeOrder(String productId, int quantityRequested, String orderId, double amountDue)
     {
         // reserve stock from inventory service
-        ReservationResults reservationResults = inventoryServiceClient.reserveStock(productId, quantityRequested);
+        ReservationResults reservationResults;
+        try
+        {
+            reservationResults = inventoryServiceClient.reserveStock(productId, quantityRequested);
+        }
+        catch (UnexpectedInventoryException e)
+        {
+            return OrderResults.UNKNOWN_RESERVATION_ERROR;
+        }
         // if stock reservation is successful, process payment
         if(reservationResults == ReservationResults.SUCCESS)
         {
@@ -70,6 +79,16 @@ public class OrderService
 
     private void releaseReservation(String productId, int quantityToReturn)
     {
+        ReturnResults returnResults;
+        try
+        {
+            returnResults = inventoryServiceClient.returnStock(productId, quantityToReturn);
+        }
+        catch (UnexpectedInventoryException e)
+        {
+            log.warn("Failed to return stock reservation for product {}.", productId);
+        }
+
         if(inventoryServiceClient.returnStock(productId, quantityToReturn) != ReturnResults.SUCCESS)
         {
             log.warn("Failed to return stock reservation for product {}.", productId);
