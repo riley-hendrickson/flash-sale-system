@@ -6,3 +6,24 @@ spring:
 
 server:
   port: 8081
+
+resilience4j:
+  retry:
+    instances:
+      paymentService:
+          max-attempts: 3
+          wait-duration: 100ms
+          retry-exceptions:
+            - flashsalesystem.orderservice.exceptions.UnexpectedPaymentException
+            - flashsalesystem.orderservice.exceptions.PaymentProcessorException
+          enable-exponential-backoff: true
+          exponential-backoff-multiplier: 1.5
+  circuitbreaker:
+    instances:
+      paymentService:
+        sliding-window-size: 10
+        sliding-window-type: COUNT_BASED
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 4
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 4

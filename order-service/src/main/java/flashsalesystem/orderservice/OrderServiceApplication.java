@@ -26,13 +26,13 @@ public class OrderServiceApplication
     }
 
     @Bean
-    public RestClient inventoryServiceClient(@Value("${services.inventory-service.url}") String inventoryServiceUrl)
+    public RestClient inventoryServiceRestClient(@Value("${services.inventory-service.url}") String inventoryServiceUrl)
     {
         return RestClient.builder().baseUrl(inventoryServiceUrl).build();
     }
 
     @Bean
-    public RestClient paymentServiceClient(@Value("${services.payment-service.url}") String paymentServiceUrl)
+    public RestClient paymentServiceRestClient(@Value("${services.payment-service.url}") String paymentServiceUrl)
     {
         return RestClient.builder().baseUrl(paymentServiceUrl).build();
     }
