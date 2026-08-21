@@ -73,6 +73,7 @@ public class OrderService
         // return appropriate OrderResult depending on reservation error
         else if(reservationResults == ReservationResults.INSUFFICIENT_STOCK) return OrderResults.INSUFFICIENT_STOCK;
         else if(reservationResults == ReservationResults.PRODUCT_NOT_FOUND) return OrderResults.PRODUCT_NOT_FOUND;
+        else if(reservationResults == ReservationResults.INVENTORY_SERVICE_UNAVAILABLE) return OrderResults.INVENTORY_SERVICE_UNAVAILABLE;
         else return OrderResults.UNKNOWN_RESERVATION_ERROR;
     }
 
@@ -86,10 +87,10 @@ public class OrderService
         }
         catch (UnexpectedInventoryException e)
         {
-            log.warn("Failed to return stock reservation for product {}.", productId);
+            returnResults = ReturnResults.UNKNOWN_ERROR;
         }
 
-        if(inventoryServiceClient.returnStock(productId, quantityToReturn) != ReturnResults.SUCCESS)
+        if(returnResults != ReturnResults.SUCCESS)
         {
             log.warn("Failed to return stock reservation for product {}.", productId);
         }
