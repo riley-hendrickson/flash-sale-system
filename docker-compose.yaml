@@ -5,6 +5,12 @@ services:
     container_name: config-server
     ports:
       - "8888:8888"
+    healthcheck:
+      test: curl -f http://localhost:8888/actuator/health
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 1s
 
   inventory-service:
     build: ./inventory-service
@@ -12,9 +18,11 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - config-server
+      config-server:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:8888
 
   order-service:
     build: ./order-service
@@ -22,9 +30,11 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - config-server
+      config-server:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:8888
 
   payment-service:
     build: ./payment-service
@@ -32,9 +42,11 @@ services:
     ports:
       - "8082:8082"
     depends_on:
-      - config-server
+      config-server:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:8888
 
   kafka:
     image: apache/kafka:4.3.1
@@ -51,3 +63,5 @@ services:
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_NUM_PARTITIONS: 1
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_LOG4J_LOGGERS: "kafka.server=INFO"
