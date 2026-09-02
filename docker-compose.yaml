@@ -7,10 +7,10 @@ services:
       - "8888:8888"
     healthcheck:
       test: curl -f http://localhost:8888/actuator/health
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
-      start_period: 1s
+      start_period: 5s
 
   inventory-service:
     build: ./inventory-service
@@ -32,9 +32,12 @@ services:
     depends_on:
       config-server:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_SERVER_URL: http://config-server:8888
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   payment-service:
     build: ./payment-service
@@ -47,6 +50,21 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_SERVER_URL: http://config-server:8888
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:8888
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   kafka:
     image: apache/kafka:4.3.1
@@ -65,3 +83,10 @@ services:
       KAFKA_NUM_PARTITIONS: 1
       KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
       KAFKA_LOG4J_LOGGERS: "kafka.server=INFO"
+
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
