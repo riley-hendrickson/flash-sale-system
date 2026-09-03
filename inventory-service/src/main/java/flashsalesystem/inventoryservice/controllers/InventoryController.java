@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/inventory")
-public class CurrentStockController
+public class InventoryController
 {
     private final InventoryService inventoryService;
 
-    public CurrentStockController(InventoryService inventoryService)
+    public InventoryController(InventoryService inventoryService)
     {
         this.inventoryService = inventoryService;
     }
@@ -26,7 +26,7 @@ public class CurrentStockController
     {
         if(reservationRequest.quantityRequested() <= 0) return ResponseEntity.badRequest().build();
 
-        ReservationResults result = inventoryService.reserve(productId, reservationRequest.quantityRequested());
+        ReservationResults result = inventoryService.reserveStock(productId, reservationRequest.quantityRequested());
 
         if(result == ReservationResults.SUCCESS) return ResponseEntity.ok().build();
         else if(result == ReservationResults.PRODUCT_NOT_FOUND) return ResponseEntity.notFound().build();
