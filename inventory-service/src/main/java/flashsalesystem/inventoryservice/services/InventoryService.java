@@ -10,9 +10,9 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 public class InventoryService
 {
-    private final ConcurrentHashMap<String, Integer> stock = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, Integer> stock = new ConcurrentHashMap<>();
 
-    public ReservationResults reserve(String productId, int quantityRequested)
+    public ReservationResults reserve(Long productId, int quantityRequested)
     {
         AtomicReference<ReservationResults> result = new AtomicReference<>();
 
@@ -41,7 +41,7 @@ public class InventoryService
         return result.get();
     }
 
-    public ReturnResults returnStock(String productId, int quantityReturned)
+    public ReturnResults returnStock(Long productId, int quantityReturned)
     {
         AtomicReference<ReturnResults> result = new AtomicReference<>();
 
@@ -65,8 +65,8 @@ public class InventoryService
 
     public InventoryService()
     {
-        stock.put("1", 1);
-        stock.put("2", 10);
-        stock.put("3", 10);
+        stock.put(1L, 1);
+        stock.put(2L, 10);
+        stock.put(3L, 10);
     }
 }

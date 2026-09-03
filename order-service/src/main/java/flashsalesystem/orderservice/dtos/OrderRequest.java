@@ -1,5 +1,5 @@
 package flashsalesystem.orderservice.dtos;
 
-public record OrderRequest(String productId, int quantity, String orderId, double amountDue)
+public record OrderRequest(Long productId, int quantity, String orderId, double amountDue)
 {
 }

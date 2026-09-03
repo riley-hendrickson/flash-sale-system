@@ -28,7 +28,7 @@ public class OrderService
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public OrderResults placeOrder(String productId, int quantityRequested, String orderId, double amountDue)
+    public OrderResults placeOrder(Long productId, int quantityRequested, String orderId, double amountDue)
     {
         OrderResults orderResults = OrderResults.SUCCESS;
         // reserve stock from inventory service
@@ -81,7 +81,7 @@ public class OrderService
     }
 
 
-    private void releaseReservation(String productId, int quantityToReturn)
+    private void releaseReservation(Long productId, int quantityToReturn)
     {
         ReturnResults returnResults;
         try

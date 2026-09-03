@@ -23,7 +23,7 @@ public class InventoryServiceClient
 
     @Retry(name = "inventoryService", fallbackMethod = "reserveStockFallback")
     @CircuitBreaker(name = "inventoryService")
-    public ReservationResults reserveStock(String productId, int quantityRequested)
+    public ReservationResults reserveStock(Long productId, int quantityRequested)
     {
         return inventoryServiceRestClient.post()
                 .uri("/inventory/{productId}/reserve", productId)
@@ -41,7 +41,7 @@ public class InventoryServiceClient
 
     @Retry(name = "inventoryService", fallbackMethod = "returnStockFallback")
     @CircuitBreaker(name = "inventoryService")
-    public ReturnResults returnStock(String productId, int quantityToReturn)
+    public ReturnResults returnStock(Long productId, int quantityToReturn)
     {
         return inventoryServiceRestClient.post()
                 .uri("/inventory/{productId}/return", productId)
@@ -55,13 +55,13 @@ public class InventoryServiceClient
                 });
     }
 
-    public ReservationResults reserveStockFallback(String productId, int quantityRequested, Throwable exception)
+    public ReservationResults reserveStockFallback(Long productId, int quantityRequested, Throwable exception)
     {
         if(exception instanceof UnexpectedInventoryException) return ReservationResults.UNKNOWN_ERROR;
         else return ReservationResults.INVENTORY_SERVICE_UNAVAILABLE;
     }
 
-    public ReturnResults returnStockFallback(String productId, int quantityToReturn, Throwable exception)
+    public ReturnResults returnStockFallback(Long productId, int quantityToReturn, Throwable exception)
     {
         if(exception instanceof UnexpectedInventoryException) return ReturnResults.UNKNOWN_ERROR;
         else return ReturnResults.INVENTORY_SERVICE_UNAVAILABLE;

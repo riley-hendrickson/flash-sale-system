@@ -22,7 +22,7 @@ public class CurrentStockController
     }
 
     @PostMapping("/{productId}/reserve")
-    public ResponseEntity<Void> reserveStock(@PathVariable String productId, @RequestBody ReservationRequest reservationRequest)
+    public ResponseEntity<Void> reserveStock(@PathVariable Long productId, @RequestBody ReservationRequest reservationRequest)
     {
         if(reservationRequest.quantityRequested() <= 0) return ResponseEntity.badRequest().build();
 
@@ -35,7 +35,7 @@ public class CurrentStockController
     }
 
     @PostMapping("/{productId}/return")
-    public ResponseEntity<Void> returnStock(@PathVariable String productId, @RequestBody ReturnRequest returnRequest)
+    public ResponseEntity<Void> returnStock(@PathVariable Long productId, @RequestBody ReturnRequest returnRequest)
     {
         if(returnRequest.quantityReturned() <= 0) return ResponseEntity.badRequest().build();
 
