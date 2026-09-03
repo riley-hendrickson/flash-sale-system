@@ -1,72 +1,42 @@
 package flashsalesystem.inventoryservice.services;
 
+import flashsalesystem.inventoryservice.entities.Product;
 import flashsalesystem.inventoryservice.enums.ReservationResults;
 import flashsalesystem.inventoryservice.enums.ReturnResults;
+import flashsalesystem.inventoryservice.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
 @Service
 public class InventoryService
 {
-    private final ConcurrentHashMap<Long, Integer> stock = new ConcurrentHashMap<>();
+    private final ProductRepository productRepository;
 
-    public ReservationResults reserve(Long productId, int quantityRequested)
+    public InventoryService(ProductRepository productRepository)
     {
-        AtomicReference<ReservationResults> result = new AtomicReference<>();
-
-        stock.compute(productId, (id, currentQuantity) ->
-        {
-            // if the product does not exist, return current quantity and set result accordingly
-            if(currentQuantity == null)
-            {
-                result.set(ReservationResults.PRODUCT_NOT_FOUND);
-                return currentQuantity;
-            }
-            // if the product is not sufficiently stocked, return current quantity and set result accordingly
-            else if(currentQuantity < quantityRequested)
-            {
-                result.set(ReservationResults.INSUFFICIENT_STOCK);
-                return currentQuantity;
-            }
-            // if the product has adequate stock, set result accordingly and return the remaining quantity
-            else
-            {
-                result.set(ReservationResults.SUCCESS);
-                return currentQuantity - quantityRequested;
-            }
-        });
-
-        return result.get();
+        this.productRepository = productRepository;
     }
 
+    @Transactional
+    public ReservationResults reserveStock(Long productId, int quantityRequested)
+    {
+        int result = productRepository.reserveStock(productId, quantityRequested);
+        if(result == 0)
+        {
+            Optional<Product> product = productRepository.findById(productId);
+            if(product.isPresent()) return ReservationResults.INSUFFICIENT_STOCK;
+            else return ReservationResults.PRODUCT_NOT_FOUND;
+        }
+        else return ReservationResults.SUCCESS;
+    }
+
+    @Transactional
     public ReturnResults returnStock(Long productId, int quantityReturned)
     {
-        AtomicReference<ReturnResults> result = new AtomicReference<>();
-
-        stock.compute(productId, (id, currentQuantity) ->
-        {
-            // if the product does not exist, return current quantity and set result accordingly
-            if(currentQuantity == null)
-            {
-                result.set(ReturnResults.PRODUCT_NOT_FOUND);
-                return currentQuantity;
-            }
-            else
-            {
-                result.set(ReturnResults.SUCCESS);
-                return currentQuantity + quantityReturned;
-            }
-        });
-
-        return result.get();
-    }
-
-    public InventoryService()
-    {
-        stock.put(1L, 1);
-        stock.put(2L, 10);
-        stock.put(3L, 10);
+        int result = productRepository.returnStock(productId, quantityReturned);
+        if(result == 0) return ReturnResults.PRODUCT_NOT_FOUND;
+        else return ReturnResults.SUCCESS;
     }
 }
