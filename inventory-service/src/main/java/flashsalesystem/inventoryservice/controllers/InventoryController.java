@@ -1,5 +1,6 @@
 package flashsalesystem.inventoryservice.controllers;
 
+import flashsalesystem.inventoryservice.dtos.ProductDTO;
 import flashsalesystem.inventoryservice.dtos.ReturnRequest;
 import flashsalesystem.inventoryservice.enums.ReservationResults;
 import flashsalesystem.inventoryservice.dtos.ReservationRequest;
@@ -8,6 +9,9 @@ import flashsalesystem.inventoryservice.services.InventoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -19,6 +23,22 @@ public class InventoryController
     public InventoryController(InventoryService inventoryService)
     {
         this.inventoryService = inventoryService;
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductDTO> getProduct(@PathVariable Long productId)
+    {
+        Optional<ProductDTO> productDTO = inventoryService.getProduct(productId);
+        if(productDTO.isPresent()) return ResponseEntity.ok().body(productDTO.get());
+        else return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductDTO>> getAllProducts()
+    {
+        List<ProductDTO> productDTOs = inventoryService.getAllProducts();
+        if(productDTOs.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok().body(productDTOs);
     }
 
     @PostMapping("/{productId}/reserve")
