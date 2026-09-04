@@ -1,4 +1,7 @@
 package flashsalesystem.inventoryservice.dtos;
 
-public record ProductDTO() {
+import java.math.BigDecimal;
+
+public record ProductDTO(Long productId, String name, BigDecimal price, int quantity)
+{
 }
