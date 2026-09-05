@@ -1,7 +1,7 @@
 package flashsalesystem.paymentservice.services;
 
+import flashsalesystem.paymentservice.config.PaymentServiceConfig;
 import flashsalesystem.paymentservice.enums.PaymentResult;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -9,20 +9,18 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class PaymentService
 {
-    private final double paymentFailureRate;
-    private final double processorFailureRate;
+    private final PaymentServiceConfig paymentServiceConfig;
 
-    public PaymentService(@Value("${app.payment-failure-rate}") double paymentFailureRate, @Value("${app.processor-failure-rate}") double processorFailureRate)
+    public PaymentService(PaymentServiceConfig paymentServiceConfig)
     {
-        this.paymentFailureRate = paymentFailureRate;
-        this.processorFailureRate = processorFailureRate;
+        this.paymentServiceConfig = paymentServiceConfig;
     }
 
     public PaymentResult processPayment(String orderId, double amountDue)
     {
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        if(random.nextDouble() <= paymentFailureRate) return PaymentResult.PAYMENT_FAILED;
-        if(random.nextDouble() <= processorFailureRate) return PaymentResult.PROCESSOR_ERROR;
+        if (random.nextDouble() <= paymentServiceConfig.getPaymentFailureRate()) return PaymentResult.PAYMENT_FAILED;
+        if (random.nextDouble() <= paymentServiceConfig.getProcessorFailureRate()) return PaymentResult.PROCESSOR_ERROR;
 
         return PaymentResult.SUCCESS;
     }
