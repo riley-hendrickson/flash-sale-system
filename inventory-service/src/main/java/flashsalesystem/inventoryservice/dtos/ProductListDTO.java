@@ -1,4 +1,7 @@
 package flashsalesystem.inventoryservice.dtos;
 
-public record ProductListDTO() {
+import java.util.List;
+
+public record ProductListDTO(List<ProductDTO> products)
+{
 }
