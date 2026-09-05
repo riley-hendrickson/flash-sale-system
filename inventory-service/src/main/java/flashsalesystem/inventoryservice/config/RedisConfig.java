@@ -18,9 +18,9 @@ public class RedisConfig
         return builder -> builder
                 .withCacheConfiguration("product",
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(30))
-                                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(GenericJacksonJsonRedisSerializer.builder().build())))
+                                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(GenericJacksonJsonRedisSerializer.builder().enableUnsafeDefaultTyping().build())))
                 .withCacheConfiguration("productList",
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(60))
-                                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(GenericJacksonJsonRedisSerializer.builder().build())));
+                                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(GenericJacksonJsonRedisSerializer.builder().enableUnsafeDefaultTyping().build())));
     }
 }
