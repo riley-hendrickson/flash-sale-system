@@ -1,6 +1,7 @@
 package flashsalesystem.inventoryservice.services;
 
 import flashsalesystem.inventoryservice.dtos.ProductDTO;
+import flashsalesystem.inventoryservice.dtos.ProductListDTO;
 import flashsalesystem.inventoryservice.entities.Product;
 import flashsalesystem.inventoryservice.enums.ReservationResults;
 import flashsalesystem.inventoryservice.enums.ReturnResults;
@@ -9,7 +10,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,20 +23,20 @@ public class InventoryService
     }
 
     @Cacheable(value = "product", key = "#productId")
-    public Optional<ProductDTO> getProduct(Long productId)
+    public ProductDTO getProduct(Long productId)
     {
         System.out.println("cache missed, fetching product: " + productId + " from database");
         Optional<Product> product = productRepository.findById(productId);
-        return product.map(this::convertProductDTO);
+        return product.map(this::convertProductDTO).orElse(null);
     }
 
     @Cacheable(value = "productList", key = "'all-products'")
-    public List<ProductDTO> getAllProducts()
+    public ProductListDTO getAllProducts()
     {
         System.out.println("cache missed, fetching all products from database");
-        return productRepository.findAll().stream()
+        return new ProductListDTO(productRepository.findAll().stream()
                 .map(this::convertProductDTO)
-                .toList();
+                .toList());
     }
 
     @Transactional
