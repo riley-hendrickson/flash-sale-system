@@ -14,7 +14,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8084/realms/flash-sale-realm
+          jwk-set-uri: http://keycloak:8084/realms/flash-sale-realm/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8084/realms/flash-sale-realm
 
 server:
   port: 8081
