@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: payment-service
+  config:
+    # "optional:" so tests don't hard-fail when no config server is reachable
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+server:
+  port: 8082
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "refresh"
+
+# Only ever supplied by the config server in production; every test needs a
+# value so PaymentServiceConfig and the CommandLineRunner bean can construct.
+app:
+  payment-failure-rate: 0.1
+  processor-failure-rate: 0.05
