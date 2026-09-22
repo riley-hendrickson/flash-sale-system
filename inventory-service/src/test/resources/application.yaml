@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: inventory-service
+  config:
+    # "optional:" so tests don't hard-fail when no config server is reachable;
+    # Testcontainers-backed ITs never need it, and it's still exercised for
+    # anything that does rely on it, same as main config, when one is up.
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/flashsale}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:password}
+  data.redis:
+      host: "${REDIS_HOST:localhost}"
+      port: "${REDIS_PORT:6379}"
+      password: "${REDIS_PASSWORD:}"
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8080
