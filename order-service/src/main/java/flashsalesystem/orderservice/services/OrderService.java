@@ -67,6 +67,7 @@ public class OrderService
                 // return appropriate OrderResult depending on payment error
                 if(paymentResults == PaymentResults.PAYMENT_FAILED) orderResults = OrderResults.PAYMENT_FAILED;
                 else if(paymentResults == PaymentResults.PAYMENT_SERVICE_UNAVAILABLE) orderResults = OrderResults.PAYMENT_SERVICE_UNAVAILABLE;
+                else if(paymentResults == PaymentResults.PROCESSOR_ERROR) orderResults = OrderResults.PAYMENT_PROCESSING_ERROR;
                 else orderResults = OrderResults.UNKNOWN_PAYMENT_ERROR;
             }
         }
