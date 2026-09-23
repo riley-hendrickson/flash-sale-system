@@ -11,9 +11,12 @@ spring:
       host: "${REDIS_HOST:localhost}"
       port: "${REDIS_PORT:6379}"
       password: "${REDIS_PASSWORD:}"
+      repositories:
+        enabled: false
   jpa:
     hibernate:
       ddl-auto: validate
+    open-in-view: false
 #    show-sql: true
   flyway:
     enabled: true

@@ -1,3 +1,8 @@
+x-quiet-spring: &quiet-spring
+  SPRING_MAIN_BANNER_MODE: "off"
+  LOGGING_LEVEL_ROOT: "WARN"
+  LOGGING_LEVEL_FLASHSALESYSTEM: "INFO"
+
 services:
 
   config-server:
@@ -5,6 +10,9 @@ services:
     container_name: config-server
     ports:
       - "8888:8888"
+    attach: false
+    environment:
+      <<: *quiet-spring
     healthcheck:
       test: curl -f http://localhost:8888/actuator/health
       interval: 5s
@@ -32,6 +40,7 @@ services:
       POSTGRES_PASSWORD: password
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      <<: *quiet-spring
 
   order-service:
     build: ./order-service
@@ -49,6 +58,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_SERVER_URL: http://config-server:8888
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      <<: *quiet-spring
 
   payment-service:
     build: ./payment-service
@@ -61,6 +71,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_SERVER_URL: http://config-server:8888
+      <<: *quiet-spring
 
   notification-service:
     build: ./notification-service
@@ -76,12 +87,14 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_SERVER_URL: http://config-server:8888
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      <<: *quiet-spring
 
   postgres:
     image: postgres:14
     container_name: flashsale-db
     ports:
       - "5432:5432"
+    attach: false
     environment:
       POSTGRES_DB: flashsale
       POSTGRES_USER: postgres
@@ -100,6 +113,7 @@ services:
     container_name: flashsalesystem-redis
     ports:
       - "6379:6379"
+    attach: false
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -112,6 +126,7 @@ services:
     container_name: kafka
     ports:
       - "9092:9092"
+    attach: false
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -138,6 +153,7 @@ services:
     container_name: keycloak
     ports:
       - "8084:8084"
+    attach: false
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin

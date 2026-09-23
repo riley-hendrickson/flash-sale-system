@@ -13,19 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @SpringBootApplication
 public class PaymentServiceApplication
 {
-    private static final Logger log = LoggerFactory.getLogger(PaymentServiceApplication.class);
-
     public static void main(String[] args)
     {
         SpringApplication.run(PaymentServiceApplication.class, args);
     }
-
-    @Bean
-    public CommandLineRunner logFailureRateOnStartup(
-            @Value("${app.processor-failure-rate}") double processorFailureRate,
-            @Value("${app.payment-failure-rate}") double paymentFailureRate)
-    {
-        return args -> log.info("Processor failure rate from config server is {} \n Payment failure rate from config server is {}", processorFailureRate, paymentFailureRate);
-    }
-
 }
