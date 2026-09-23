@@ -133,16 +133,20 @@ services:
       start_period: 5s
 
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
+    # pinned to the version the realm in ./keycloak was exported from
+    image: quay.io/keycloak/keycloak:26.7.4
     container_name: keycloak
     ports:
       - "8084:8084"
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
-    command: start-dev --http-port=8084
+    # --import-realm loads every realm JSON in /opt/keycloak/data/import on startup,
+    # skipping any realm that already exists in keycloak_data
+    command: start-dev --http-port=8084 --import-realm
     volumes:
       - keycloak_data:/opt/keycloak/data
+      - ./keycloak:/opt/keycloak/data/import:ro
 
 volumes:
   postgres-data:
