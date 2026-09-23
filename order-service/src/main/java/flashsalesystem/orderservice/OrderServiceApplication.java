@@ -20,12 +20,6 @@ public class OrderServiceApplication
     }
 
     @Bean
-    public CommandLineRunner logDiscountRateOnStartup(@Value("${app.discount-rate}") double discountRate)
-    {
-        return args -> log.info("Discount rate from config server is {}", discountRate);
-    }
-
-    @Bean
     public RestClient inventoryServiceRestClient(@Value("${services.inventory-service.url}") String inventoryServiceUrl)
     {
         return RestClient.builder().baseUrl(inventoryServiceUrl).build();
