@@ -3,6 +3,7 @@ package flashsalesystem.orderservice.controllers;
 import flashsalesystem.orderservice.dtos.OrderRequest;
 import flashsalesystem.orderservice.dtos.OrderResponse;
 import flashsalesystem.orderservice.enums.OrderResults;
+import flashsalesystem.orderservice.metrics.OrderMetrics;
 import flashsalesystem.orderservice.services.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController
 {
     private final OrderService orderService;
+    private final OrderMetrics orderMetrics;
 
-    public OrderController(OrderService orderService)
+    public OrderController(OrderService orderService, OrderMetrics orderMetrics)
     {
         this.orderService = orderService;
+        this.orderMetrics = orderMetrics;
     }
 
     @PostMapping
     public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest orderRequest)
     {
         OrderResults result = orderService.placeOrder(orderRequest.productId(), orderRequest.quantity(), orderRequest.orderId(), orderRequest.amountDue());
+        orderMetrics.recordOutcome(result);
 
         if(result == OrderResults.SUCCESS) return ResponseEntity.status(HttpStatus.CREATED).body(new OrderResponse(result, "Order placed successfully"));
         else if(result == OrderResults.INSUFFICIENT_STOCK)
