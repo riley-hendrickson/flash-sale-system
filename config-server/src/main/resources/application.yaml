@@ -8,3 +8,18 @@ spring:
           uri: https://github.com/riley-hendrickson/flash-sale-system-config
 server:
   port: 8888
+
+management:
+  server:
+    port: 8085
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        http.client.requests: true

@@ -16,6 +16,20 @@ spring:
         jwt:
           jwk-set-uri: http://keycloak:8084/realms/flash-sale-realm/protocol/openid-connect/certs
           issuer-uri: http://localhost:8084/realms/flash-sale-realm
+management:
+  server:
+    port: 8085
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        http.client.requests: true
 
 server:
   port: 8081

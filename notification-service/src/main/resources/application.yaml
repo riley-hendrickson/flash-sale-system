@@ -14,6 +14,21 @@ spring:
         spring.json.trusted.packages: "flashsalesystem.notificationservice.events"
         spring.json.value.default.type: "flashsalesystem.notificationservice.events.OrderEvent"
 
+management:
+  server:
+    port: 8085
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        http.client.requests: true
+
 server:
   port: 8083
 

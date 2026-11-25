@@ -22,5 +22,20 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+management:
+  server:
+    port: 8085
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        http.client.requests: true
+
 server:
   port: 8080
