@@ -1,0 +1,10 @@
+apiVersion: 1
+
+providers:
+  - name: flash-sale
+    folder: Flash Sale                # Grafana folder the dashboard appears in
+    type: file
+    disableDeletion: true             # can't be deleted from the UI
+    allowUiUpdates: false             # the file is the source of truth
+    options:
+      path: /etc/grafana/provisioning/dashboards   # where the JSON files are inside the container
