@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s          # how often Prometheus pulls from every target
+
+scrape_configs:                 # top-level section, a sibling of global, not inside it
+  - job_name: flash-sale-services       # one list item = one scrape job
+    metrics_path: /actuator/prometheus  # default is /metrics, which Spring doesn't serve
+    static_configs:
+      - targets:
+          - order-service:8085          # container hostname : management port
