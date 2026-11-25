@@ -7,3 +7,7 @@ scrape_configs:                 # top-level section, a sibling of global, not in
     static_configs:
       - targets:
           - order-service:8085          # container hostname : management port
+          - config-server:8085
+          - inventory-service:8085
+          - notification-service:8085
+          - payment-service:8085
