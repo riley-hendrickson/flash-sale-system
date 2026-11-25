@@ -164,6 +164,14 @@ services:
       - keycloak_data:/opt/keycloak/data
       - ./keycloak:/opt/keycloak/data/import:ro
 
+  prometheus:
+    image: prom/prometheus:v3.16.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
 volumes:
   postgres-data:
   keycloak_data:
