@@ -1,0 +1,10 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus           # fixed ID; dashboard JSON will reference this
+    type: prometheus
+    access: proxy             # the Grafana server makes the requests, inside the Compose network
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false           # the file is the source of truth, so no UI edits that would be lost
