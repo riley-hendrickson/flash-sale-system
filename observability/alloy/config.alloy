@@ -1,0 +1,43 @@
+// 1. Find running containers via the Docker API
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// 2. Turn Docker metadata into Loki labels
+discovery.relabel "containers" {
+  targets = []
+
+  // Compose adds a label naming each container's service; use it as service_name
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service_name"
+  }
+}
+
+// 3. Read each container's log output
+loki.source.docker "containers" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.containers.targets
+  relabel_rules = discovery.relabel.containers.rules
+  forward_to    = [loki.process.json.receiver]
+}
+
+// 4. Parse the ECS JSON and promote level to a label
+loki.process "json" {
+  stage.json {
+    expressions = { level = "log.level" }   // nested field path
+  }
+
+  stage.labels {
+    values = { level = "" }   // "" = use the extracted value of the same name
+  }
+
+  forward_to = [loki.write.local.receiver]
+}
+
+// 5. Push to Loki
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
